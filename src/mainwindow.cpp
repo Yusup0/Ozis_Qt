@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     ReadSettings();
-//    ui->stackedWidget_2->setCurrentWidget(ui->page_4);
+    ui->stackedWidget_2->setCurrentWidget(ui->page_4);
     if (user_.GetLogin() != "there is no login") {
         api_.RequestBearer(user_);
         connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBearer);
@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     QScroller::grabGesture(ui->scrollArea_2, QScroller::LeftMouseButtonGesture);
     QScroller::grabGesture(ui->scrollArea_3, QScroller::LeftMouseButtonGesture);
     QScroller::grabGesture(ui->scrollArea_4, QScroller::LeftMouseButtonGesture);
-//    eventFilter(ui->scrollArea, QEvent::Wheel);
+
     AnimationLeft();
     AnimationRight();
     beginning_path_ = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation);
@@ -127,13 +127,31 @@ void MainWindow::ResponseRegister() {
 }
 
 void MainWindow::ResponseBDAdd() {
-//    qDebug() << api_.reply_->readAll();
+    QString name = sender()->objectName();
+    QList<QLineEdit*> list;
+    QLabel *text_lable;
+    if (name == "contract") {
+        list << ui->lineEdit_6;
+        text_lable = ui->label_6;
+    } else if (name == "category") {
+        list << ui->lineEdit_15;
+        text_lable = ui->label_7;
+    } else if (name == "retailer") {
+        list << ui->lineEdit_7 << ui->lineEdit_9 << ui->lineEdit_10;
+        text_lable = ui->label_14;
+    } else if (name == "product") {
+        list << ui->lineEdit_8 << ui->lineEdit_11 << ui->lineEdit_12 << ui->lineEdit_13;
+        text_lable = ui->label_18;
+    }
     int status_code = api_.reply_->attribute(QNetworkRequest::HttpStatusCodeAttribute).value<int>();
     if (status_code == 200) {
-        active_label_->setText("Успешно");
-        active_line_->clear();
+        for (auto &i: list) i->clear();
+        text_lable->setText("Успешно");
+        if (name == "product") {
+            ui->textEdit->clear();
+        }
     } else {
-        active_label_->setText("Ошибка");
+        text_lable->setText("Ошибка");
     }
 }
 
@@ -160,7 +178,6 @@ void MainWindow::ResponseArchiveBD() {
 
 void MainWindow::PriceChange(int number) {
     static_cast<QSpinBox*>(sender())->clearFocus();
-//    static_cast<QSpinBox*>(sender())->findChild<QLineEdit*>()->clearFocus();
     ui->label_15->setText(QString("<p align=center><font size=5>%L1</font>").arg(order_.GetTotalPrice()));
 
     QString ob_name = "label_" + sender()->objectName().section('_', 1, 1);
@@ -176,7 +193,7 @@ void MainWindow::PriceChange(int number) {
 
 
 void MainWindow::on_pushButton_2_clicked() {
-    QDir dir(beginning_path_ + "/bd_local/");
+    QDir dir(beginning_path_ + "/bd/");
     if (dir.exists())
         dir.removeRecursively();
     dir.mkpath(".");
@@ -193,8 +210,7 @@ void MainWindow::on_pushButton_3_clicked() {
 void MainWindow::on_pushButton_10_clicked() {
     if (ui->lineEdit_6->text().isEmpty()) return;
     api_.RequestAddContract(user_, ui->lineEdit_6->text());
-    active_label_ = ui->label_6;
-    active_line_ = ui->lineEdit_6;
+    api_.reply_->setObjectName("contract");
     connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBDAdd);
 }
 
@@ -224,8 +240,7 @@ void MainWindow::on_pushButton_18_clicked() {
 void MainWindow::on_pushButton_15_clicked() {
     if (ui->lineEdit_15->text().isEmpty()) return;
     api_.RequestAddCategory(user_, ui->lineEdit_15->text());
-    active_label_ = ui->label_7;
-    active_line_ = ui->lineEdit_15;
+    api_.reply_->setObjectName("category");
     connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBDAdd);
 }
 
@@ -376,7 +391,6 @@ void MainWindow::ProductOnWidgit(QScrollArea *scroll_area) {
         }
         file_product_->close();
     }
-
     layoutV->addStretch();
 }
 
@@ -446,7 +460,7 @@ void MainWindow::LabelClicked(QString text) {
     ui->stackedWidget_2->move(QPoint(-1000, 0));
     delete ui->scrollArea->widget();
     order_.SetIdRetailer(text.toInt());
-//    ui->label_16->setText("Контракты");
+    ui->label_16->setText("Контракты");
     ContractOnWidgit(ui->scrollArea);
     animation_right->start();
  }
@@ -455,7 +469,7 @@ void MainWindow::Label1Clicked(QString text) {
     ui->stackedWidget_2->move(QPoint(-1000, 0));
     delete ui->scrollArea->widget();
     data_[0] = text;
-//    ui->label_16->setText("Категории");
+    ui->label_16->setText("Категории");
     CategoryOnWidgit(ui->scrollArea);
     animation_right->start();
 }
@@ -498,11 +512,11 @@ void MainWindow::on_pushButton_12_clicked() {
     Zip(data_, beginning_path_ + "/bd/send.zip", false);
     data << beginning_path_ + "/bd/send.zip";
     api_.RequestAddRetailer(user_, data);
-//    connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBDAdd);
+    api_.reply_->setObjectName("retailer");
+    connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBDAdd);
 }
 
 void MainWindow::on_pushButton_19_clicked() {
-    qDebug() << ui->comboBox_2->currentText().isEmpty();
     if (ui->lineEdit_13->text().isEmpty() || ui->lineEdit_8->text().isEmpty()
         || ui->lineEdit_11->text().isEmpty() || data_.empty() || ui->comboBox_2->isWindowModified()
         || ui->comboBox_2->currentText().isEmpty() || ui->comboBox_3->currentText().isEmpty()) return;
@@ -517,6 +531,8 @@ void MainWindow::on_pushButton_19_clicked() {
     Zip(data_, beginning_path_ + "/bd/send.zip", false);
     data << beginning_path_ + "/bd/send.zip";
     api_.RequestAddProduct(user_, data);
+    api_.reply_->setObjectName("product");
+    connect(api_.reply_, &QIODevice::readyRead, this, &MainWindow::ResponseBDAdd);
 }
 
 void MainWindow::on_pushButton_14_clicked() {
@@ -638,7 +654,7 @@ void MainWindow::on_pushButton_22_clicked() {
     separators <<  beginning_path_ + "/bd/orders"  << "В базе" << "green" << "white" << "bd_";
     QList<QList<QString>> data;
     data << directories << separators;
-//    ui->label_16->setText("Заказы");
+    ui->label_16->setText("Заказы");
     data_.clear();
     OrderOnWidgit(ui->scrollArea, data);
 //    animation_right->start();
