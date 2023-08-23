@@ -521,12 +521,12 @@ void MainWindow::on_pushButton_19_clicked() {
         || ui->lineEdit_11->text().isEmpty() || data_.empty() || ui->comboBox_2->isWindowModified()
         || ui->comboBox_2->currentText().isEmpty() || ui->comboBox_3->currentText().isEmpty()) return;
     QStringList data;
-    data << ui->lineEdit_13->text();
-    data << ui->lineEdit_8->text();
+    data << ui->lineEdit_13->text().trimmed();
+    data << ui->lineEdit_8->text().trimmed();
     data << GetIdBD(QFile(beginning_path_ + "/bd/contract.csv"), ui->comboBox_2->currentText());
-    data << ui->lineEdit_11->text();
+    data << ui->lineEdit_11->text().trimmed();
     data << GetIdBD(QFile(beginning_path_ + "/bd/category.csv"), ui->comboBox_3->currentText());
-    data << ui->lineEdit_12->text();
+    data << ui->lineEdit_12->text().trimmed();
     data << ui->textEdit->toPlainText().replace('\n', "<?>");
     Zip(data_, beginning_path_ + "/bd/send.zip", false);
     data << beginning_path_ + "/bd/send.zip";
