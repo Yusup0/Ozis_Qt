@@ -28,12 +28,12 @@ MainWindow::MainWindow(QWidget *parent)
   ui->setupUi(this);
 
   ReadSettings();
-  //    ui->stackedWidget_2->setCurrentWidget(ui->page_4);
-  //    if (user_.GetLogin() != "there is no login") {
-  //        api_.RequestBearer(user_);
-  //        connect(api_.reply_, &QIODevice::readyRead, this,
-  //        &MainWindow::ResponseBearer);
-  //    }
+  ui->stackedWidget_2->setCurrentWidget(ui->page_4);
+  if (user_.GetLogin() != "there is no login") {
+    api_.RequestBearer(user_);
+    connect(api_.reply_, &QIODevice::readyRead, this,
+            &MainWindow::ResponseBearer);
+  }
   QScroller::grabGesture(ui->scrollArea, QScroller::LeftMouseButtonGesture);
   QScroller::grabGesture(ui->scrollArea_2, QScroller::LeftMouseButtonGesture);
   QScroller::grabGesture(ui->scrollArea_3, QScroller::LeftMouseButtonGesture);

@@ -18,7 +18,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core5Compat)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Concurrent)
 
-include(../android_openssl/android_openssl.cmake)
+#include(../android_openssl/android_openssl.cmake)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -57,7 +57,7 @@ else()
         add_library(Ozis SHARED
             ${PROJECT_SOURCES}
         )
-    add_android_openssl_libraries(Ozis)
+#    add_android_openssl_libraries(Ozis)
 # Define properties for Android with Qt 5 after find_package() calls as:
 #    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
     else()
