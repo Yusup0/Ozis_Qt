@@ -1,5 +1,6 @@
 // Copyright (C) 2016 The Qt Company Ltd.
-// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR
+// GPL-2.0-only OR GPL-3.0-only
 #ifndef QZIPWRITER_H
 #define QZIPWRITER_H
 
@@ -18,61 +19,58 @@
 // We mean it.
 //
 
-#include <QtCore/qstring.h>
 #include <QtCore/qfile.h>
+#include <QtCore/qstring.h>
 
 QT_BEGIN_NAMESPACE
 
 class QZipWriterPrivate;
 
-
-class Q_GUI_EXPORT QZipWriter
-{
+class Q_GUI_EXPORT QZipWriter {
 public:
-    explicit QZipWriter(const QString &fileName, QIODevice::OpenMode mode = (QIODevice::WriteOnly | QIODevice::Truncate) );
+  explicit QZipWriter(const QString &fileName,
+                      QIODevice::OpenMode mode = (QIODevice::WriteOnly |
+                                                  QIODevice::Truncate));
 
-    explicit QZipWriter(QIODevice *device);
-    ~QZipWriter();
+  explicit QZipWriter(QIODevice *device);
+  ~QZipWriter();
 
-    QIODevice* device() const;
+  QIODevice *device() const;
 
-    bool isWritable() const;
-    bool exists() const;
+  bool isWritable() const;
+  bool exists() const;
 
-    enum Status {
-        NoError,
-        FileWriteError,
-        FileOpenError,
-        FilePermissionsError,
-        FileError
-    };
+  enum Status {
+    NoError,
+    FileWriteError,
+    FileOpenError,
+    FilePermissionsError,
+    FileError
+  };
 
-    Status status() const;
+  Status status() const;
 
-    enum CompressionPolicy {
-        AlwaysCompress,
-        NeverCompress,
-        AutoCompress
-    };
+  enum CompressionPolicy { AlwaysCompress, NeverCompress, AutoCompress };
 
-    void setCompressionPolicy(CompressionPolicy policy);
-    CompressionPolicy compressionPolicy() const;
+  void setCompressionPolicy(CompressionPolicy policy);
+  CompressionPolicy compressionPolicy() const;
 
-    void setCreationPermissions(QFile::Permissions permissions);
-    QFile::Permissions creationPermissions() const;
+  void setCreationPermissions(QFile::Permissions permissions);
+  QFile::Permissions creationPermissions() const;
 
-    void addFile(const QString &fileName, const QByteArray &data);
+  void addFile(const QString &fileName, const QByteArray &data);
 
-    void addFile(const QString &fileName, QIODevice *device);
+  void addFile(const QString &fileName, QIODevice *device);
 
-    void addDirectory(const QString &dirName);
+  void addDirectory(const QString &dirName);
 
-    void addSymLink(const QString &fileName, const QString &destination);
+  void addSymLink(const QString &fileName, const QString &destination);
 
-    void close();
+  void close();
+
 private:
-    QZipWriterPrivate *d;
-    Q_DISABLE_COPY_MOVE(QZipWriter)
+  QZipWriterPrivate *d;
+  Q_DISABLE_COPY_MOVE(QZipWriter)
 };
 
 QT_END_NAMESPACE
